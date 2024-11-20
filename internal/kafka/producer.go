@@ -29,7 +29,7 @@ func NewProducer(address []string) (*Producer, error) {
 }
 
 // отправка сообщений
-func (p *Producer) Produce(message, topic string) error {
+func (p *Producer) Produce(message, topic, key string) error {
 
 	kafkaMsg := &kafka.Message{
 		//в какую партицию
@@ -37,7 +37,8 @@ func (p *Producer) Produce(message, topic string) error {
 			//самораспределение
 			Partition: kafka.PartitionAny},
 		Value: []byte(message),
-		Key:   nil,
+		//ключ для распределения по партициям
+		Key:   []byte(key),
 	}
 	//обратная связь о статусе
 	kafkaChan := make(chan kafka.Event)
