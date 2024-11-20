@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	k "kafka-golang/internal/kafka"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ func main() {
 	for i := 0; i < 1000; i++ {
 		msg := fmt.Sprintf("Kafka message %d", i)
 		key := keys[i%numberOfCase]
-		err = p.Produce(msg, topic, key)
+		err = p.Produce(msg, topic, key, time.Now())
 		if err != nil {
 			logrus.Error(err)
 		}

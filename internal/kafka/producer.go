@@ -3,6 +3,7 @@ package kafka
 import (
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
@@ -11,7 +12,7 @@ type Producer struct {
 	producer *kafka.Producer
 }
 
-const(
+const (
 	flushTimeout = 5000 //ms
 )
 
@@ -29,7 +30,7 @@ func NewProducer(address []string) (*Producer, error) {
 }
 
 // отправка сообщений
-func (p *Producer) Produce(message, topic, key string) error {
+func (p *Producer) Produce(message, topic, key string, t time.Time) error {
 
 	kafkaMsg := &kafka.Message{
 		//в какую партицию
@@ -38,7 +39,8 @@ func (p *Producer) Produce(message, topic, key string) error {
 			Partition: kafka.PartitionAny},
 		Value: []byte(message),
 		//ключ для распределения по партициям
-		Key:   []byte(key),
+		Key:       []byte(key),
+		Timestamp: t,
 	}
 	//обратная связь о статусе
 	kafkaChan := make(chan kafka.Event)
