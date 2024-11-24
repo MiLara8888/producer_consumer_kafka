@@ -20,15 +20,31 @@ const (
 func main() {
 
 	h := handler.NewHandler()
-	c, err := kafka.NewConsumer(h, address, topic, consumerGroup)
+	c1, err := kafka.NewConsumer(h, address, topic, consumerGroup, 1)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	c.Start()
+	c2, err := kafka.NewConsumer(h, address, topic, consumerGroup, 2)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	c3, err := kafka.NewConsumer(h, address, topic, consumerGroup, 3)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	go func ()  {
+		c1.Start()
+	}()
+	go func ()  {
+		c2.Start()
+	}()
+	go func ()  {
+		c3.Start()
+	}()
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 
 	<-signalChan
-	logrus.Fatal(c.Stop())
+	logrus.Fatal(c2.Stop(), c1.Stop(), c3.Stop())
 }

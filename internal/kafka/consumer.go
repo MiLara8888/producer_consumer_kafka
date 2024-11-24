@@ -14,16 +14,17 @@ const (
 )
 
 type Handler interface {
-	HandleMessage(message []byte, offset kafka.Offset) error
+	HandleMessage(message []byte, offset kafka.TopicPartition, consumerNumber int) error
 }
 
 type Consumer struct {
-	consumer *kafka.Consumer
-	handler  Handler
-	stop     bool
+	consumer       *kafka.Consumer
+	handler        Handler
+	stop           bool
+	consumerNumber int
 }
 
-func NewConsumer(handler Handler, address []string, topic, consumerGroup string) (*Consumer, error) {
+func NewConsumer(handler Handler, address []string, topic, consumerGroup string, consumerNumber int) (*Consumer, error) {
 	cfg := kafka.ConfigMap{
 		"bootstrap.servers":        strings.Join(address, ","),
 		"group.id":                 consumerGroup,
@@ -43,7 +44,10 @@ func NewConsumer(handler Handler, address []string, topic, consumerGroup string)
 		return nil, err
 	}
 
-	return &Consumer{consumer: c, handler: handler}, nil
+	return &Consumer{
+		consumer:       c,
+		handler:        handler,
+		consumerNumber: consumerNumber}, nil
 }
 
 func (c *Consumer) Start() {
@@ -59,7 +63,7 @@ func (c *Consumer) Start() {
 			continue
 		}
 		//обработка сообщений
-		err = c.handler.HandleMessage(kafkaMsg.Value, kafkaMsg.TopicPartition.Offset)
+		err = c.handler.HandleMessage(kafkaMsg.Value, kafkaMsg.TopicPartition, c.consumerNumber)
 		if err != nil {
 			logrus.Error(err)
 			continue

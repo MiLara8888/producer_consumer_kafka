@@ -12,7 +12,7 @@ func NewHandler() *Handler {
 	return &Handler{}
 }
 
-func (h *Handler) HandleMessage(message []byte, offset kafka.Offset) error {
-	logrus.Info(string(message), "message from kafka", "offset", offset)
+func (h *Handler) HandleMessage(message []byte, partition kafka.TopicPartition, consumerNumber int) error {
+	logrus.Info(string(message), "message from kafka", "offset", partition, consumerNumber)
 	return nil
 }
