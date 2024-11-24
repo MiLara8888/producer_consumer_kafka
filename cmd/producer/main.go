@@ -25,7 +25,7 @@ func main() {
 
 	keys := generateUuidString()
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 5000; i++ {
 		msg := fmt.Sprintf("Kafka message %d", i)
 		key := keys[i%numberOfCase]
 		err = p.Produce(msg, topic, key, time.Now())
